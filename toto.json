@@ -1,0 +1,16 @@
+{ 
+  "lieu": [ 
+      {
+          "nom": "test1", 
+          "action":"test1"
+      }, 
+      {
+          "nom": "test2", 
+          "action": "test2"
+      }, 
+      {
+          "nom": "test3",
+          "action": "test3"
+      }
+   ] 
+}
