@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<window id="GMapWindow" title="Geolocation"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		style="width: 320px; height: 220px;">
+
+		<iframe src="testiFrame.html" flex = "1"/>
+		
+		<script>
+			function returnLat()
+			{
+				var lat = window.arguments[0];
+				return lat;
+			}
+			
+			function returnLgt()
+			{
+				var lgt = window.arguments[1];
+				return lgt;
+			}
+		</script>
+		
+</window>

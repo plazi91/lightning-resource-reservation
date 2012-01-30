@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<toolbar id="toolbar-menubar">
+		<button label="test" oncommand="launch()"/>
+	</toolbar>
+
+	<script>
+		function launch()
+		{
+			var win = window.open('chrome://test/content/test.xul', 'test', 'chrome,centerscreen');
+			win.focus();
+		}
+	</script>
+
+</overlay>
