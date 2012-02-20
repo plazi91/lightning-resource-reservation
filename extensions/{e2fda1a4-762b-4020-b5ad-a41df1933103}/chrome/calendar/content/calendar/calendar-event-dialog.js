@@ -990,7 +990,7 @@ function saveDialog(item) {
 	**/
 	// BEGIN
 	var geoLocation = document.getElementById("Location-geo");
-	if( geoLocation.getAttribute('selected') == true )
+	if( geoLocation.getAttribute('selected') == "true" )
 	{
 		setItemProperty(item, "LOCATION", "");
 		setItemProperty(item, "GEOLOC_ACTIV", "true");
@@ -3325,7 +3325,6 @@ function keyIsAlreadyExist(key) {
 			for(var i = 0; i < treeChildren.view.rowCount; i++)
 			{
 				var cellKey = treeChildren.view.getCellText(i, treeChildren.columns.getNamedColumn('col1'));
-				alert(cellKey + " = " + key);
 				if( cellKey == key )
 					return true;
 			}
