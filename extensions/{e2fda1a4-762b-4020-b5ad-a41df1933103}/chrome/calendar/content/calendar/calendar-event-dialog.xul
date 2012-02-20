@@ -687,9 +687,9 @@
                        accesskey="&event.location.accesskey;"
                        control="item-location"
                        disable-on-readonly="true"/>					
-				<menulist editable="true" id="item-location" disable-on-readonly="true">
-					<menupopup id="menupopupPlace"/>
-				</menulist>
+				<menulist id="item-location" 
+						disable-on-readonly="true"
+						editable="true"/>
 				<textbox id="Location-lat" hidden="true"/>
 				<textbox id="Location-lgt" hidden="true"/>
 				<iframe id="iFrameGeo" src="chrome://calendar/content/geolocation/iFrameGeo.html" hidden="true" style="width: 550px; height: 380px;"/>

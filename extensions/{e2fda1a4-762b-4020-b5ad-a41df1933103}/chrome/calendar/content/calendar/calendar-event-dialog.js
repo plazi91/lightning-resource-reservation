@@ -370,6 +370,8 @@ function loadDialog(item)
 	}
 	else
 	{
+		document.getElementById("Location-geo").setAttribute("selected", "false");
+		document.getElementById("Location-name").setAttribute("selected", "true");
 		showListLocation();
 	}
 	
@@ -987,14 +989,15 @@ function saveDialog(item) {
 	* LOCATION
 	**/
 	// BEGIN
-	if( document.getElementById("Location-geo").selected )
+	var geoLocation = document.getElementById("Location-geo");
+	if( geoLocation.getAttribute('selected') == true )
 	{
 		setItemProperty(item, "LOCATION", "");
 		setItemProperty(item, "GEOLOC_ACTIV", "true");
 		setItemProperty(item, "LOCATION_LATITUDE", getElementValue("Location-lat")); 
 		setItemProperty(item, "LOCATION_LONGITUDE", getElementValue("Location-lgt"));
 	}
-	else if( document.getElementById("Location-name").selected )
+	else 
 	{
 		setItemProperty(item, "LOCATION_LATITUDE", "");
 		setItemProperty(item, "LOCATION_LONGITUDE", "");
@@ -3313,7 +3316,28 @@ function capValues(aCap, aDefault) {
 * JULIEN LACROIX
 **/
 // BEGIN
+function keyIsAlreadyExist(key) {
+	var treeChildren = document.getElementById("item-resources");
+	if( treeChildren.view != null )
+	{
+		if( treeChildren.view.rowCount > 0 )
+		{
+			for(var i = 0; i < treeChildren.view.rowCount; i++)
+			{
+				var cellKey = treeChildren.view.getCellText(i, treeChildren.columns.getNamedColumn('col1'));
+				alert(cellKey + " = " + key);
+				if( cellKey == key )
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
 function addResource(key, value) {
+	if(keyIsAlreadyExist(key))
+		return;
+		
 	var treeChildren = document.getElementById("ResourcesTreeChildren");
 	
 	var treeItem = document.createElement("treeitem");
