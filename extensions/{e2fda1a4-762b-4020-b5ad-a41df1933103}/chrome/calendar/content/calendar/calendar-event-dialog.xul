@@ -670,26 +670,29 @@
             </row>
 
             <!-- Location -->
+			<row id="event-grid-location-row"
+                 align="center">
+                <label value=""/>
+				<radiogroup>
+					<hbox>
+						<radio id="Location-name" selected="true" label="Liste de lieu" oncommand="showListLocation()"/>
+						<radio id="Location-geo" label="Geolocalisation" oncommand="showGeoLocation()"/>
+					</hbox>
+				</radiogroup>
+			</row>
+			
             <row id="event-grid-location-row"
                  align="center">
                 <label value="&event.location.label;"
                        accesskey="&event.location.accesskey;"
                        control="item-location"
-                       disable-on-readonly="true"/>
-				<vbox>
-					<radiogroup>
-						<hbox>
-							<radio id="Location-name" selected="true" label="Liste de lieu" oncommand="showListLocation()"/>
-							<radio id="Location-geo" label="Geolocalisation" oncommand="showGeoLocation()"/>
-						</hbox>
-					</radiogroup>
-					<menulist editable="true" id="item-location" disable-on-readonly="true">
-						<menupopup id="menupopupPlace" onpopupshowing="fillPlace()"/>
-					</menulist>
-					<textbox id="Location-lat" hidden="true"/>
-					<textbox id="Location-lgt" hidden="true"/>
-					<iframe id="iFrameGeo" src="chrome://calendar/content/geolocation/iFrameGeo.html" hidden="true" style="width: 550px; height: 380px;"/>
-				</vbox>
+                       disable-on-readonly="true"/>					
+				<menulist editable="true" id="item-location" disable-on-readonly="true">
+					<menupopup id="menupopupPlace"/>
+				</menulist>
+				<textbox id="Location-lat" hidden="true"/>
+				<textbox id="Location-lgt" hidden="true"/>
+				<iframe id="iFrameGeo" src="chrome://calendar/content/geolocation/iFrameGeo.html" hidden="true" style="width: 550px; height: 380px;"/>
             </row>
 
 			<!-- NATURE -->
@@ -703,7 +706,8 @@
                           disable-on-readonly="true"
                           flex="1"
 						  editable="true"
-						  oncommand="natureSelected()"/>
+						  oninput="AddRessourcesFromFullNature()"
+						  oncommand="AddRessourcesFromFullNature()"/>
             </row>
 			
             <!-- Category & Calendar -->
@@ -1111,7 +1115,7 @@
 				</tree>
 			</row>
 			
-			<!-- Resources -->
+			<!-- Add Resource -->
 			<row id="event-button-resources-row" flex="1" hidden="true">
 				<label value="" disable-on-readonly="true"/>
 				<button id="addResource" label="+" oncommand="addResource('', '')"/>

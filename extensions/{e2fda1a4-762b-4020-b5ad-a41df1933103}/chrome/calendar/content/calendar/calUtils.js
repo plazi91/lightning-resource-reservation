@@ -574,16 +574,6 @@ function getPrefCategoriesArray() {
 }
 
 /**
-* JULIEN LACROIX
-* NATURE
-**/
-function getPrefNatureArray() {
-    // connection base pour récupérer les natures existantes
-    var aNature = ["Nature1", "Nature2", "Nature3"];
-	return aNature;
-}
-
-/**
  * Convert categories string to list of category names.
  *
  * Stored categories may include escaped commas within a name.

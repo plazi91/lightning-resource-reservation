@@ -390,49 +390,23 @@ function appendCategoryItems(aItem, aCategoryMenuList, aCommand) {
 * JULIEN LACROIX
 * NATURE
 **/
-function appendNatureItems(aItem, aNatureMenuList, aCommand) {
-    var natureList = getPrefNatureArray();
-	
-	// 'split'may return an array containing one
-    // empty string, rather than an empty array. This results in an empty
-    // menulist item with no corresponding category.
-    if (natureList.length == 1 && !natureList[0].length) {
-        natureList.pop();
-    }
+//BEGIN
+function appendItems(aItem, aMenuList, aList, aMenuListSelected, aCommand) {
 
-    // insert the category already in the menulist so it doesn't get lost
-    /*if (aItem) {
-        for each (var itemNature in aItem.getNature({})) {
-            if (!natureList.some(function(cat){ return cat == itemNature; })){
-                natureList.push(itemNature);
-            }
-        }
-        cal.sortArrayByLocaleCollator(natureList);
-    }*/
-
-    while (aNatureMenuList.hasChildNodes()) {
-       aNatureMenuList.removeChild(aNatureMenuList.lastChild);
+	while (aMenuList.hasChildNodes()) {
+       aMenuList.removeChild(aMenuList.lastChild);
     }
 
     var indexToSelect = 0;
-    var menuitem = addMenuItem(aNatureMenuList, calGetString("calendar", "None"), "NONE", aCommand);
-    if (aNatureMenuList.localName == "menupopup") {
-        menuitem.setAttribute("type", "checkbox");
-    }
-    for (var i in natureList) {
-        var menuitem = addMenuItem(aNatureMenuList, natureList[i], natureList[i], aCommand);
-        if (aNatureMenuList.localName == "menupopup") {
-            menuitem.setAttribute("type", "checkbox");
-        }
-        /*if (itemNature && natureList[i] == itemNature) {
-            indexToSelect = parseInt(i) + 1;  // Add 1 because of 'None'
-        }*/
-    }
+    for (var i in aList) 
+	{
+        addMenuItem(aMenuList, aList[i], aList[i], aCommand);
+		if( aMenuListSelected == aMenuList.getItemAtIndex(i).value )
+			indexToSelect = i;
+	}	
     return indexToSelect;
 }
-
-
-
+//END
 
 /**
  * Helper function to add a menuitem to a menulist or similar.

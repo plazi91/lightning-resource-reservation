@@ -330,7 +330,7 @@ function onCancel() {
  * @param item      The item to parse information out of.
  */
 function loadDialog(item) 
-{
+{	
     setElementValue("item-title", item.title);
 	
 	/**
@@ -363,7 +363,6 @@ function loadDialog(item)
 				{
 					document.getElementById("Location-geo").setAttribute("selected", "false");
 					document.getElementById("Location-name").setAttribute("selected", "true");
-					setElementValue("item-location", item.getProperty("LOCATION"));
 					showListLocation();
 				}
 			}
@@ -371,26 +370,81 @@ function loadDialog(item)
 	}
 	else
 	{
-		setElementValue("item-location", item.getProperty("LOCATION"));
 		showListLocation();
 	}
+	
+	var locationList = new Array;
+	let listener = {
+            onOperationComplete:
+            function onOperationComplete(aCalendar, aStatus, aOperationType, aId, aDateTime) {
+            },
+            onGetResult:
+            function onGetResult(aCalendar, aStatus, aItemType, aDetail, aCount, aItems) {
+				locationList.push("");
+				for each (var t in aItems)
+				{
+					if( t.hasProperty("LOCATION") )
+					{
+						var bExist = false;
+						var natureName = t.getProperty("LOCATION");
+						for (var i = 0; i < locationList.length; i++)
+						{
+							if( natureName == locationList[i] )
+								bExist = true;
+						}
+						if(!bExist)
+							locationList.push(natureName);
+					}
+				}
+				var locationMenuListSelected = "";
+				if( item.hasProperty("LOCATION") )
+					locationMenuListSelected = item.getProperty("LOCATION");
+				
+				var locationMenuList = document.getElementById("item-location");
+				var indexToSelect = appendItems(item, locationMenuList, locationList, locationMenuListSelected);
+				locationMenuList.selectedIndex = indexToSelect;
+            }
+        };
+	window.opener.getCompositeCalendar().getItems(Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT, 0, null, null, listener);
 	
 	/**
 	* JULIEN LACROIX
 	* X-MOZ-EVENT-NATURE-NAME
 	**/
-	var natureMenuList = document.getElementById("item-nature");
-    var indexToSelect = appendNatureItems(item, natureMenuList);
-
-    natureMenuList.selectedIndex = indexToSelect;
-	
-	/**
-	* JULIEN LACROIX
-	* X-MOZ-EVENT-NATURE-RESOURCE
-	**/
-	/*if (item.hasProperty("RESOURCES")) 
-	{
-    }*/
+	var natureList = new Array;
+	let listener = {
+            onOperationComplete:
+            function onOperationComplete(aCalendar, aStatus, aOperationType, aId, aDateTime) {
+            },
+            onGetResult:
+            function onGetResult(aCalendar, aStatus, aItemType, aDetail, aCount, aItems) {
+				natureList.push("");
+				for each (var t in aItems)
+				{
+					if( t.hasProperty("X-MOZ-EVENT-NATURE-NAME") )
+					{
+						var bExist = false;
+						var natureName = t.getProperty("X-MOZ-EVENT-NATURE-NAME");
+						for (var i = 0; i < natureList.length; i++)
+						{
+							if( natureName == natureList[i] )
+								bExist = true;
+						}
+						if(!bExist)
+							natureList.push(natureName);
+					}
+				}
+				var natureMenuListSelected = "";
+				if( item.hasProperty("X-MOZ-EVENT-NATURE-NAME") )
+					natureMenuListSelected = item.getProperty("X-MOZ-EVENT-NATURE-NAME");
+				
+				var natureMenuList = document.getElementById("item-nature");
+				var indexToSelect = appendItems(item, natureMenuList, natureList, natureMenuListSelected);
+				natureMenuList.selectedIndex = indexToSelect;
+				AddRessourcesFromItemNature(item);
+            }
+        };
+	window.opener.getCompositeCalendar().getItems(Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT, 0, null, null, listener);
 	// END
 	
     loadDateTime(item);
@@ -936,58 +990,57 @@ function saveDialog(item) {
 	if( document.getElementById("Location-geo").selected )
 	{
 		setItemProperty(item, "LOCATION", "");
-					
 		setItemProperty(item, "GEOLOC_ACTIV", "true");
 		setItemProperty(item, "LOCATION_LATITUDE", getElementValue("Location-lat")); 
 		setItemProperty(item, "LOCATION_LONGITUDE", getElementValue("Location-lgt"));
 	}
-	else
+	else if( document.getElementById("Location-name").selected )
 	{
-		setItemProperty(item, "GEOLOC_ACTIV", "false");
 		setItemProperty(item, "LOCATION_LATITUDE", "");
 		setItemProperty(item, "LOCATION_LONGITUDE", "");
-					
+		setItemProperty(item, "GEOLOC_ACTIV", "false");
 		setItemProperty(item, "LOCATION", getElementValue("item-location"));
 	}
 
 	/**
 	* JULIEN LACROIX
 	* X-MOZ-EVENT-NATURE-NAME
+	* EX: 
 	* "X-MOZ-EVENT-NATURE-NAME" => "coursUML"
 	**/
-	setItemProperty(item, "X-MOZ-EVENT-NATURE-NAME", document.getElementById("item-nature").value);
+	var nature = getElementValue("item-nature");
+	setItemProperty(item, "X-MOZ-EVENT-NATURE-NAME", nature);
 	
 	/**
 	* JULIEN LACROIX
 	* X-MOZ-EVENT-NATURE-RESOURCE
-		"X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS" => "coursUML%20%VIDEOPROJECTEUR;FEUTRES;PLACES_MIN_DISPO"
-	    "X-MOZ-EVENT-NATURE-RESOURCE" => "VIDEOPROJECTEUR;OUI"
-	    "X-MOZ-EVENT-NATURE-RESOURCE" => "FEUTRES;BLEU,ROUGE,VERT"
-	    "X-MOZ-EVENT-NATURE-RESOURCE" => "PLACES_MIN_DISPO;25"
+	* EX: 
+	* "X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS" => "coursUML%20%VIDEOPROJECTEUR;"
+	* "X-MOZ-EVENT-NATURE-RESOURCE_VIDEOPROJECTEUR" => "OUI"
 	**/
 	var resourceTreeElement = document.getElementById("item-resources");
-	if( resourceTreeElement.view.rowCount > 0 )
+	if( resourceTreeElement.view != null )
 	{
-		var resources_association = "";
-		for(var i = 0; i < resourceTreeElement.view.rowCount; i++)
+		if( resourceTreeElement.view.rowCount > 0 )
 		{
-			var resources = "";
-			var cellText1 = resourceTreeElement.view.getCellText(i, resourceTreeElement.columns.getNamedColumn('col1'));
-			var cellText2 = resourceTreeElement.view.getCellText(i, resourceTreeElement.columns.getNamedColumn('col2'));
-			
-			resources_association += document.getElementById("item-nature").selectedIndex;
+			var resources_association = "";
+			resources_association += getElementValue("item-nature");
 			resources_association += "%20%";
-			resources_association += cellText1;
-			resources_association += ";";
-
-			resources += cellText1;
-			resources += ";";
-			resources += cellText2;
-			//alert(resources);
-			setItemProperty(item, "X-MOZ-EVENT-NATURE-RESOURCE", resources);
+			for(var i = 0; i < resourceTreeElement.view.rowCount; i++)
+			{
+				var cellText1 = resourceTreeElement.view.getCellText(i, resourceTreeElement.columns.getNamedColumn('col1'));
+				var cellText2 = resourceTreeElement.view.getCellText(i, resourceTreeElement.columns.getNamedColumn('col2'));
+				
+				if( cellText1 != "" )
+				{
+					resources_association += cellText1;
+					resources_association += ";";
+					var resourceKeyName = "X-MOZ-EVENT-NATURE-RESOURCE_" + cellText1;
+					setItemProperty(item, resourceKeyName, cellText2);
+				}
+			}
+			setItemProperty(item, "X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS", resources_association);
 		}
-		//alert(resources_association);
-		setItemProperty(item, "X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS", resources);
 	}
 	//END
 	
@@ -3260,24 +3313,7 @@ function capValues(aCap, aDefault) {
 * JULIEN LACROIX
 **/
 // BEGIN
-function fillResources()
-{
-	var nature = document.getElementById("item-nature").value;
-	var treeChildren = document.getElementById("ResourcesTreeChildren");
-	
-	while (treeChildren.firstChild) 
-		treeChildren.removeChild(treeChildren.firstChild);
-	
-	for(var i = 0; i < 1; i++)
-	{
-		var key = "";
-		var value= "";
-		addResource(key, value);
-	}
-}
-
-function addResource(key, value)
-{
+function addResource(key, value) {
 	var treeChildren = document.getElementById("ResourcesTreeChildren");
 	
 	var treeItem = document.createElement("treeitem");
@@ -3286,14 +3322,15 @@ function addResource(key, value)
 	var treeCell2 = document.createElement("treecell");
 	
 	if( key == "" )
-		key = "key";
-	if( value == "" )
-		value = "value";
+	{
+		key = "key" + (document.getElementById("item-resources").view.rowCount + 1);
+		value = "value" + (document.getElementById("item-resources").view.rowCount + 1);
+	}
 		
-	treeCell1.setAttribute('label', key + (document.getElementById("item-resources").view.rowCount + 1));
-	treeCell1.setAttribute('value', key + (document.getElementById("item-resources").view.rowCount + 1));
-	treeCell2.setAttribute('label', value + (document.getElementById("item-resources").view.rowCount + 1));
-	treeCell2.setAttribute('value', value + (document.getElementById("item-resources").view.rowCount + 1));
+	treeCell1.setAttribute('label', key);
+	treeCell1.setAttribute('value', key);
+	treeCell2.setAttribute('label', value);
+	treeCell2.setAttribute('value', value);
 	
 	treeRow.appendChild(treeCell1);
 	treeRow.appendChild(treeCell2);
@@ -3301,35 +3338,107 @@ function addResource(key, value)
 	treeChildren.appendChild(treeItem);
 }
 
-function natureSelected()
-{
+function AddRessourcesFromFullNature() {
 	var treeChildren = document.getElementById("ResourcesTreeChildren");
 	while (treeChildren.firstChild)
 		treeChildren.removeChild(treeChildren.firstChild);
-			
-	if( document.getElementById("item-nature").value == "" )
+		
+	if( getElementValue("item-nature") == "" )
 	{		
 		document.getElementById("event-grid-resources-row").hidden = true;
 		document.getElementById("event-button-resources-row").hidden = true;
 	}
 	else
 	{
-		// A RAFRAICHIR LE TREE DES RESSOURCES
 		document.getElementById("event-grid-resources-row").hidden = false;
 		document.getElementById("event-button-resources-row").hidden = false;
+		
+		let listener = {
+				onOperationComplete:
+				function onOperationComplete(aCalendar, aStatus, aOperationType, aId, aDateTime) {
+				},
+				onGetResult:
+				function onGetResult(aCalendar, aStatus, aItemType, aDetail, aCount, aItems) {
+					for each (var t in aItems)
+					{
+						if( t.hasProperty("X-MOZ-EVENT-NATURE-NAME") )
+						{
+							var natureName = getElementValue("item-nature");
+							if( t.hasProperty("X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS") )
+							{
+								var natureResourcesAssociations = t.getProperty("X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS");
+								var natureNameTmp = natureResourcesAssociations.split("%20%");
+								if( natureName == natureNameTmp[0] )
+								{
+									var natureRessourcesTmp = natureNameTmp[1].split(";");
+									for( var i = 0; i < natureRessourcesTmp.length - 1; i++ )
+									{
+										var resourceKeyName = "X-MOZ-EVENT-NATURE-RESOURCE_" + natureRessourcesTmp[i];
+										if( t.hasProperty(resourceKeyName) )
+										{
+											var resourceValueName = t.getProperty(resourceKeyName);
+											addResource(natureRessourcesTmp[i], resourceValueName);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			};
+		window.opener.getCompositeCalendar().getItems(Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT, 0, null, null, listener);
 	}
 }
 
-function showListLocation()
-{
+function AddRessourcesFromItemNature(item) {
+	var treeChildren = document.getElementById("ResourcesTreeChildren");
+	while (treeChildren.firstChild)
+		treeChildren.removeChild(treeChildren.firstChild);
+		
+	if( getElementValue("item-nature") == "" )
+	{		
+		document.getElementById("event-grid-resources-row").hidden = true;
+		document.getElementById("event-button-resources-row").hidden = true;
+	}
+	else
+	{
+		document.getElementById("event-grid-resources-row").hidden = false;
+		document.getElementById("event-button-resources-row").hidden = false;
+		
+		if( item.hasProperty("X-MOZ-EVENT-NATURE-NAME") )
+		{
+			var natureName = getElementValue("item-nature");
+			if( item.hasProperty("X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS") )
+			{
+				var natureResourcesAssociations = item.getProperty("X-MOZ-EVENT-NATURE-RESOURCES-ASSOCIATIONS");
+				var natureNameTmp = natureResourcesAssociations.split("%20%");
+				if( natureName == natureNameTmp[0] )
+				{
+					var natureRessourcesTmp = natureNameTmp[1].split(";");
+					for( var i = 0; i < natureRessourcesTmp.length - 1; i++ )
+					{
+						var resourceKeyName = "X-MOZ-EVENT-NATURE-RESOURCE_" + natureRessourcesTmp[i];
+						if( item.hasProperty(resourceKeyName) )
+						{
+							var resourceValueName = item.getProperty(resourceKeyName);
+							addResource(natureRessourcesTmp[i], resourceValueName);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function showListLocation() {
 	document.getElementById("Location-lat").hidden = true;
 	document.getElementById("Location-lgt").hidden = true;
 	document.getElementById("iFrameGeo").hidden = true;
+	
 	document.getElementById("item-location").hidden = false;
 }
 
-function showGeoLocation()
-{
+function showGeoLocation() {
 	var geolocation = Components.classes["@mozilla.org/geolocation;1"].getService(Components.interfaces.nsIDOMGeoGeolocation);
 	
 	document.getElementById("item-location").hidden = true;
@@ -3354,13 +3463,11 @@ function showGeoLocation()
 	document.getElementById("Location-lgt").hidden = true;
 }
 
-function setLat(newLat)
-{
+function setLat(newLat) {
 	setElementValue("Location-lat", newLat);
 }
 
-function setLgt(newLgt)
-{
+function setLgt(newLgt) {
 	setElementValue("Location-lgt", newLgt);
 }
 // END
