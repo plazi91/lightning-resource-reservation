@@ -63,7 +63,8 @@
 <dialog id="calendar-event-dialog"
         title="&event.title.label;"
         windowtype="Calendar:EventDialog"
-        onload="onLoad()"
+        onload="onLoad();"
+        onunload="onEventDialogUnload();"
         ondialogaccept="return onAccept();"
         ondialogcancel="return onCancel();"
         persist="screenX screenY width height"
@@ -659,7 +660,7 @@
             <!-- Title -->
             <row id="event-grid-title-row"
                  align="center">
-                <label value="&event.title.label;"
+                <label value="&event.title.textbox.label;"
                        accesskey="&event.title.textbox.accesskey;"
                        control="item-title"
                        disable-on-readonly="true"/>
@@ -695,7 +696,7 @@
 				<iframe id="iFrameGeo" src="chrome://calendar/content/geolocation/iFrameGeo.html" hidden="true" style="width: 550px; height: 380px;"/>
             </row>
 
-			<!-- NATURE -->
+			<!-- Nature -->
             <row id="event-grid-nature-color-row"
                  align="center">
                 <label value="Nature"
@@ -1103,7 +1104,7 @@
 			<!-- Resources -->
 			<row id="event-grid-resources-row" flex="1" hidden="true">
                 <label value="Ressources"
-                       accesskey="R"
+                       accesskey="e"
                        control="item-resources"
                        disable-on-readonly="true"/>
 				<tree id="item-resources" rows="10" seltype="cell" editable="true" hidecolumnpicker="true">
@@ -1121,7 +1122,7 @@
 				<button id="addResource" label="+" oncommand="addResource('', '')"/>
 			</row>
 			
-            <separator class="groove" id="event-grid-attachment-separator"/>
+			<separator class="groove" id="event-grid-attachment-separator"/>
 
             <!-- Attachment -->
             <row id="event-grid-attachment-row"

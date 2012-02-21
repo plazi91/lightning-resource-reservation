@@ -74,7 +74,7 @@ function onLoad() {
             window.close();
 
             return item;
-        }
+        };
     }
 
     // set the dialog-id to enable the right window-icon to be loaded.
@@ -84,7 +84,11 @@ function onLoad() {
         setDialogId(document.documentElement, "calendar-task-summary-dialog");
     }
 
-    window.readOnly = calendar.readOnly;
+    window.readOnly = !(isCalendarWritable(calendar)
+                        && (userCanModifyItem(item)
+                            || (calInstanceOf(item.calendar, Components.interfaces.calISchedulingSupport)
+                                && item.calendar.isInvitation(item)
+                                && userCanRespondToInvitation(item))));
     if (!window.readOnly && calInstanceOf(calendar, Components.interfaces.calISchedulingSupport)) {
         var attendee = calendar.getInvitedAttendee(item);
         if (attendee) {
@@ -125,51 +129,11 @@ function onLoad() {
     updateAttendees();
     updateLink();
 
-	/**
-	* JULIEN LACROIX
-	* LOCATION
-	**/
-	/*if( item.hasProperty("GEOLOC_ACTIV") )
-	{
-		var geolocationActived = item.getProperty("GEOLOC_ACTIV");
-		if( geolocationActived && geolocationActived.length )
-		{
-			if( geolocationActived == "true" )
-			{
-				/*var geolocationLatitude = item.getProperty("LOCATION_LATITUDE");
-				var geolocationLatitudeN-S = item.getProperty("LOCATION_N-S");
-				var geolocationLongitude = item.getProperty("LOCATION_LONGITUDE");
-				var geolocationLongitudeE-W = item.getProperty("LOCATION_E-W");
-				if( geolocationLatitude && geolocationLatitudeN-S && geolocationLongitude && geolocationLongitudeE-W )
-				{*/
-					/*document.getElementById("Location-geo").setAttribute("selected", "true");
-					document.getElementById("Location-name").setAttribute("selected", "false");
-					document.getElementById("location-row").removeAttribute("hidden");
-					document.getElementById("item-location").value = "GEOLOCATION";
-				//}
-			}
-			else
-			{
-				var location = item.getProperty("LOCATION");
-				if( location && location.length ) 
-				{
-					document.getElementById("Location-geo").setAttribute("selected", "false");
-					document.getElementById("Location-name").setAttribute("selected", "true");
-					document.getElementById("location-row").removeAttribute("hidden");
-					document.getElementById("item-location").value = location;
-				}
-			}
-		}
-	}
-	else
-	{*/
-		var location = item.getProperty("LOCATION");
-		if (location && location.length) 
-		{
-			document.getElementById("location-row").removeAttribute("hidden");
-			document.getElementById("item-location").value = location;
-		}
-	//}
+    var location = item.getProperty("LOCATION");
+    if (location && location.length) {
+        document.getElementById("location-row").removeAttribute("hidden");
+        document.getElementById("item-location").value = location;
+    }
 
     var categories = item.getCategories({});
     if (categories.length > 0) {
@@ -231,8 +195,8 @@ function onLoad() {
 
 /**
  * Saves any changed information to the item.
- * 
- * @return      Returns true if the dialog 
+ *
+ * @return      Returns true if the dialog
  */
 function onAccept() {
     dispose();
@@ -283,6 +247,16 @@ function updateInvitationStatus() {
 function updateInvitation() {
   var statusElement = document.getElementById("item-participation");
   if (window.attendee) {
+      let item = window.arguments[0];
+      let aclEntry = item.calendar.aclEntry;
+      if (aclEntry) {
+          let userAddresses = aclEntry.getUserAddresses({});
+          if (userAddresses.length > 0
+              && !cal.attendeeMatchesAddresses(window.attendee, userAddresses)) {
+              window.attendee.setProperty("SENT-BY", "mailto:" + userAddresses[0]);
+          }
+      }
+
       window.attendee.participationStatus = statusElement.value;
   }
 }
@@ -308,14 +282,14 @@ function updateRepeatDetails() {
     }
 
     document.getElementById("repeat-row").removeAttribute("hidden");
-    
+
     // First of all collapse the details text. If we fail to
     // create a details string, we simply don't show anything.
     // this could happen if the repeat rule is something exotic
     // we don't have any strings prepared for.
     var repeatDetails = document.getElementById("repeat-details");
     repeatDetails.setAttribute("collapsed", "true");
-    
+
     // Try to create a descriptive string from the rule(s).
     var kDefaultTimezone = calendarDefaultTimezone();
     var startDate =  item.startDate || item.entryDate;
@@ -324,7 +298,7 @@ function updateRepeatDetails() {
     endDate = endDate ? endDate.getInTimezone(kDefaultTimezone) : null;
     var detailsString = recurrenceRule2String(
         recurrenceInfo, startDate, endDate, startDate.isDate);
-        
+
     // Now display the string...
     if (detailsString) {
         var lines = detailsString.split("\n");

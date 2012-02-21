@@ -145,4 +145,4 @@ pref("calendar.threading.disabled", false);
 pref("calendar.network.multirealm", false);
 
 // Set up user agent
-pref("calendar.useragent.extra", "Lightning/1.1.1");
+pref("calendar.useragent.extra", "Lightning/1.2.1");
