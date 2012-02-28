@@ -1,7 +1,12 @@
 /*
+*
+* LIGHTNING++
+*
 * Author
 * LACROIX Julien
+*
 */
+
 INTERN UNIVERSITY MANAGER :
 Mr Courtaud
 
