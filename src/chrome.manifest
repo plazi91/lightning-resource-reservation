@@ -1,0 +1,2 @@
+content	LightningEXT 	content/
+overlay chrome://calendar/content/calendar-event-dialog.xul chrome://LightningEXT/content/ExtLight.xul

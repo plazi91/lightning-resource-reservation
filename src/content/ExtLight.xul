@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	
+	<script type="application/javascript"
+		src="chrome://LightningEXT/content/script.js"/>
+     
+    <rows id="event-grid-rows">
+	
+		<!-- Location choice -->
+		<row id="event-grid-location-xxx" insertbefore="event-grid-location-row"
+			 align="center">
+			<label value=""/>
+			<radiogroup>
+				<hbox>
+					<radio id="Location-name" selected="true" label="Nom" oncommand="showListLocation()"/>
+					<radio id="Location-geo" label="Geolocalisation" oncommand="showGeoLocation()"/>
+				</hbox>
+			</radiogroup>
+		</row>
+		
+		<!-- Location -->
+		<row id="event-grid-location-row"
+			 align="center">
+			<textbox id="item-location" removeelement="true"/>
+			<menulist id="item-NewLocation"
+					disable-on-readonly="true"
+					editable="true"/>
+			<hbox>
+				<textbox id="Location-lat" hidden="true"/>
+				<textbox id="Location-lgt" hidden="true"/>
+				<iframe id="iFrameGeo" src="chrome://LightningEXT/content/geolocation.html" hidden="true" style="width: 570px; height: 385px;"/>
+			</hbox>
+		</row>
+
+		<!-- Nature -->
+		<row id="event-grid-nature-color-row" insertafter="event-grid-location-row"
+			 align="center">
+			<label value="Nature"
+				   accesskey="N"
+				   control="item-nature"
+				   disable-on-readonly="true"/>
+			<menulist id="item-nature"
+					  disable-on-readonly="true"
+					  flex="1"
+					  editable="true"
+					  oninput="AddResourcesFromNature()"
+					  oncommand="AddResourcesFromNature()"/>
+		</row>
+
+		<!-- Description -->
+		<row id="event-grid-description-row" flex="1">
+			<textbox id="item-description" removeelement="true"/>
+			<textbox id="item-NewDescription"
+					 disable-on-readonly="true"
+					 flex="1"
+					 style="min-height: 100px;"
+					 multiline="true"
+					 rows="12"/>
+		</row>
+
+		<!-- Resources -->
+		<row id="event-grid-resources-row" flex="1" hidden="true" insertafter="event-grid-description-row">
+			<label value="Ressources"
+				   accesskey="R"
+				   control="item-resources"
+				   disable-on-readonly="true"/>
+			<tree id="item-resources" rows="10" seltype="cell" editable="true" hidecolumnpicker="true">
+				<treecols>
+					<treecol id="col1" label="Ressources" flex="1" />
+					<treecol id="col2" label="" flex="1"/>
+				</treecols>
+				<treechildren id="ResourcesTreeChildren"></treechildren>
+			</tree>
+		</row>
+		
+		<!-- Add Resource -->
+		<row id="event-button-resources-row" flex="1" hidden="true">
+			<label value="" disable-on-readonly="true"/>
+			<button id="addResource" label="+" oncommand="addResource('', '')"/>
+		</row>
+	</rows>		
+</overlay>
