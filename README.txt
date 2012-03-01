@@ -6,21 +6,13 @@
 * LACROIX Julien
 *
 */
-
-EXTERN UNIVERSITY MANAGER :
-Mr Courtaud
-
-INTERN UNIVERSITY MANAGER :
-Mr Thao Le
-
 CONTRIBUTORS :
 Lacroix Julien (Project Manager)
 
 PROJECT DESCRIPTION :
-It's a study project.
 The goal of this existing project is to make events more accurate.
 
-Essential development :
+Features :
 	- Update location; addition of geolocation,
 	- Update type,
 	- Update resources needed,
@@ -55,3 +47,8 @@ The event dialog opens and you can see new items.
 	Remark: By removing the key field, you will delete the resource too.
 
 EnJoy ^^
+
+THANKS : 
+Mr Courtaud, my extern university manager.
+Mr Thao Le, my intern university manager.
+Mozilla community
