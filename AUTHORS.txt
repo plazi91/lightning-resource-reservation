@@ -1,0 +1,8 @@
+/*
+*
+* LIGHTNING++
+*
+*/
+
+CONTRIBUTORS:
+Lacroix Julien (Project Manager)
